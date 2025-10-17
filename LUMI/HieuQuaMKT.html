@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Báo cáo chi phí tổng hợp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="stylemkt.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+</head>
+
+<body>
+  <div id="loading-overlay">Đang tải dữ liệu...</div>
+
+  <!-- TAB 1: BÁO CÁO CHI TIẾT -->
+  
+  <!-- TAB 2: BÁO CÁO KPI -->
+  
+  <!-- TAB 3: HIỆU QUẢ MKT (GIAO DIỆN MỚI) -->
+  <div id="MarketReport" class="tab-content" style="display: block;">
+    <div class="report-header">
+      <div class="report-title">THỐNG KÊ HIỆU QUẢ MARKETING THEO SẢN PHẨM & THỊ TRƯỜNG</div>
+      <div class="report-date" id="report-date-mkt"></div>
+    </div>
+    <div class="filter-container">
+      <div class="filter-group">
+        <label for="quick-date-mkt">Chọn nhanh:</label>
+        <select id="quick-date-mkt">
+          <option value="">-- Tùy chọn --</option>
+          <optgroup label="Tuần">
+            <option value="lastWeek">Tuần trước</option>
+            <option value="thisWeek">Tuần này</option>
+          </optgroup>
+          <optgroup label="Tháng">
+            <option value="thisMonth">Tháng này</option>
+            <option value="month_1">Tháng 1</option>
+            <option value="month_2">Tháng 2</option>
+            <option value="month_3">Tháng 3</option>
+            <option value="month_4">Tháng 4</option>
+            <option value="month_5">Tháng 5</option>
+            <option value="month_6">Tháng 6</option>
+            <option value="month_7">Tháng 7</option>
+            <option value="month_8">Tháng 8</option>
+            <option value="month_9">Tháng 9</option>
+            <option value="month_10">Tháng 10</option>
+            <option value="month_11">Tháng 11</option>
+            <option value="month_12">Tháng 12</option>
+          </optgroup>
+          <optgroup label="Quý">
+            <option value="quarter_1">Quý 1</option>
+            <option value="quarter_2">Quý 2</option>
+            <option value="quarter_3">Quý 3</option>
+            <option value="quarter_4">Quý 4</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="filter-group"> <label for="start-date-mkt">Từ ngày:</label> <input type="date" id="start-date-mkt">
+      </div>
+      <div class="filter-group"> <label for="end-date-mkt">Đến ngày:</label> <input type="date" id="end-date-mkt">
+      </div>
+      <div class="filter-group"> <label for="team-filter-mkt">Team:</label> <select id="team-filter-mkt"
+          multiple></select> </div>
+      <div class="filter-group"> <label for="ca-filter-mkt">Ca:</label> <select id="ca-filter-mkt"
+          multiple></select> </div>
+      <div class="filter-group"> <label for="market-filter-mkt">Thị trường:</label> <select id="market-filter-mkt"
+          multiple></select> </div>
+      <div class="filter-group"> <label for="product-filter-mkt">Sản phẩm:</label> <select id="product-filter-mkt"
+          multiple></select> </div>
+      <button id="apply-filter-mkt">Áp dụng</button>
+    </div>
+
+    <div id="non-asia-market-mkt" style="display: none;">
+      <div class="section-title">THỊ TRƯỜNG NGOÀI CHÂU Á</div>
+      <div class="table-responsive-container">
+        <table id="non-asia-table-mkt">
+          <thead>
+            <tr>
+              <th>Sản phẩm</th>
+              <th>Thị trường</th>
+              <th class="text-right">CPQC</th>
+              <th class="text-center">Số mess</th>
+              <th class="text-center">Số đơn (TT)</th>
+              <th class="text-right">DS Sau HH (TT)</th>
+              <th class="text-center">%CP/DS (Sau HH)</th>
+              <th class="text-right">CPS</th>
+              <th class="text-right">Giá đơn TB</th>
+              <th class="text-center">Tỉ lệ chốt (TT)</th>
+            </tr>
+          </thead>
+          <tbody id="non-asia-body-mkt"></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="asia-market-mkt" style="display: none;">
+      <div class="section-title">THỊ TRƯỜNG CHÂU Á</div>
+      <div class="table-responsive-container">
+        <table id="asia-table-mkt">
+          <thead>
+            <tr>
+              <th>Sản phẩm</th>
+              <th>Thị trường</th>
+              <th class="text-right">CPQC</th>
+              <th class="text-center">Số mess</th>
+              <th class="text-center">Số đơn (TT)</th>
+              <th class="text-right">DS Sau HH (TT)</th>
+              <th class="text-center">%CP/DS (Sau HH)</th>
+              <th class="text-right">CPS</th>
+              <th class="text-right">Giá đơn TB</th>
+              <th class="text-center">Tỉ lệ chốt (TT)</th>
+            </tr>
+          </thead>
+          <tbody id="asia-body-mkt"></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="summary-market-mkt" style="display: none;">
+      <div class="section-title">TỔNG HỢP TẤT CẢ THỊ TRƯỜNG</div>
+      <div class="table-responsive-container">
+        <table id="summary-table-mkt">
+          <thead>
+            <tr>
+              <th>Sản phẩm</th>
+              <th></th>
+              <th class="text-right">CPQC</th>
+              <th class="text-center">Số mess</th>
+              <th class="text-center">Số đơn (TT)</th>
+              <th class="text-right">DS Sau HH (TT)</th>
+              <th class="text-center">%CP/DS (Sau HH)</th>
+              <th class="text-right">CPS</th>
+              <th class="text-right">Giá đơn TB</th>
+              <th class="text-center">Tỉ lệ chốt (TT)</th>
+            </tr>
+          </thead>
+          <tbody id="summary-body-mkt"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="mkt-charts-section" style="display: none;">
+      <div class="section-title">BIỂU ĐỒ TRỰC QUAN</div>
+      <div class="mkt-charts-container">
+        <div class="chart-wrapper"><canvas id="mktProductSalesChart"></canvas></div>
+        <div class="chart-wrapper"><canvas id="mktProductDsChotChart"></canvas></div>
+        <div class="chart-wrapper"><canvas id="mktProductCpqcChart"></canvas></div>
+        <div class="chart-wrapper"><canvas id="mktProductCpsChart"></canvas></div>
+        <div class="chart-wrapper"><canvas id="mktProductClosingRateChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+  <!-- TAB MỚI: Nội dung báo cáo thủ công -->
+
+
+  <script>
+    // =================================================================================
+    // --- I. KHAI BÁO BIẾN TOÀN CỤC & CẤU HÌNH ---
+    // =================================================================================
+
+    const host = 'prod'
+    const hostUse = host === 'local' ? 'http://localhost:8081' : 'https://n-api-gamma.vercel.app';
+    const API_URL = `${hostUse}/report/generate?tableName=Báo cáo MKT`;
+
+    const CHART_COLORS = [
+      '#4CAF50', '#2196F3', '#FFC107', '#F44336', '#9C27B0', '#009688',
+      '#FF9800', '#795548', '#607D8B', '#E91E63', '#3F51B5', '#8BC34A'
+    ];
+
+    const MARKET_GROUPS = {
+      'Châu Á': ['Hàn Quốc', 'Nhật Bản', 'VN'],
+      'Ngoài Châu Á': ['Úc', 'US', 'Canada']
+    };
+
+    // --- Biến lưu trữ trạng thái (State) của ứng dụng ---
+    let masterData = [];
+    let employeeData = [];
+    let baseDataForReport = [];
+    const charts = {};
+
+    // =================================================================================
+    // --- II. KHỞI TẠO ỨNG DỤNG ---
+    // =================================================================================
+
+    document.addEventListener('DOMContentLoaded', () => {
+      Chart.register(ChartDataLabels);
+      setupEventListeners();
+      setDefaultDates();
+      fetchAndProcessData();
+      document.getElementById("defaultOpen").click();
+    });
+
+    function setDefaultDates() {
+      const today = new Date();
+      const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+      const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+      const formatDateForInput = (date) => date.toISOString().split('T')[0];
+      const dateInputs = [
+        'start-date-mkt', 'end-date-mkt'
+      ];
+      dateInputs.forEach(id => {
+        const el = document.getElementById(id);
+        if (id.startsWith('start-')) el.value = formatDateForInput(firstDay);
+        else el.value = formatDateForInput(lastDay);
+      });
+    }
+
+    function setupEventListeners() {
+      document.body.addEventListener('change', handleFilterChange);
+      document.getElementById('apply-filter-mkt').addEventListener('click', applyTab4Filters);
+    }
+
+    // =================================================================================
+    // --- III. TẢI VÀ XỬ LÝ DỮ LIỆU ---
+    // =================================================================================
+    async function fetchEmployeeData(result) {
+      try {
+        return result
+          .filter(r => r["Họ Và Tên"] && String(r["Họ Và Tên"]).trim() !== '')
+          .map(r => ({
+            idnv: (r["id"] || '').trim(), ten: (r["Họ Và Tên"] || 'N/A').trim(),
+            email: (r["Email"] || '').trim(), team: (r["Team"] || 'N/A').trim(),
+            chucVu: (r["Vị trí"] || '').trim().toLowerCase(),
+            chiNhanh: (r["chi nhánh"] || 'N/A').trim(),
+          }));
+      } catch (err) { console.error("Lỗi tải dữ liệu nhân viên:", err); return []; }
+    }
+
+    async function fetchAndProcessData() {
+      showLoader();
+      try {
+        const response = await fetch(API_URL);
+        const result = await response.json();
+        employeeData = await fetchEmployeeData(result.employeeData || { rows: [] });
+        masterData = result.data
+          .filter(r => r["Tên"] && String(r["Tên"]).trim() !== '')
+          .map(r => {
+            const dsChot = Number(r["Doanh số"]) || 0;
+            const dsSauHoanHuy = Number(r["DS sau hoàn hủy"]) || 0;
+            return {
+              idnv: (r["id_NS"] || '').trim(), ten: (r["Tên"] || 'N/A').trim(),
+              email: (r["Email"] || '').trim(), ngay: new Date(r["Ngày"]),
+              ca: (r["ca"] || 'N/A').trim(), sanPham: (r["Sản_phẩm"] || 'N/A').trim(),
+              thiTruong: (r["Thị_trường"] || 'N/A').trim(), team: (r["Team"] || 'Khác').trim(),
+              chucVu: (r["Chức vụ"] || '').trim().toLowerCase(), cpqc: Number(r["CPQC"]) || 0,
+              soMessCmt: Number(r["Số_Mess_Cmt"]) || 0, soDon: Number(r["Số đơn"]) || 0,
+              dsChot: dsChot, soDonHuy: Number(r["Số đơn hoàn hủy"]) || 0,
+              doanhSoHuy: dsChot - dsSauHoanHuy, dsSauHoanHuy: dsSauHoanHuy,
+              dsSauShip: Number(r["Doanh số sau ship"]) || 0,
+              dsThanhCong: Number(r["Doanh số TC"]) || 0,
+              kpiValue: Number(r["KPIs"]) || 0,
+              soDonThucTe: Number(r["Số đơn thực tế"]) || 0,
+              dsChotThucTe: Number(r["Doanh thu chốt thực tế"]) || 0,
+              dsHoanHuyThucTe: Number(r["Doanh số hoàn hủy thực tế"]) || 0,
+              soDonHuyThucTe: Number(r["Số đơn hoàn hủy thực tế"]) || 0,
+              dsSauHoanHuyThucTe: Number(r["Doanh số sau hoàn hủy thực tế"]) || 0,
+              dsThanhCongThucTe: Number(r["Doanh số đi thực tế"]) || 0,
+            };
+          });
+        
+        setupInitialReportView();
+        populateAllFilters();
+        initMarketReportCharts(); 
+        applyTab4Filters();
+      } catch (err) {
+        console.error("Lỗi tải dữ liệu:", err);
+        alert('Không thể tải dữ liệu từ API. Vui lòng kiểm tra lại.');
+        document.getElementById('report-title-tab1').textContent = `LỖI TẢI DỮ LIỆU`;
+      } finally {
+        hideLoader();
+      }
+    }
+
+function setupInitialReportView() {
+  const idFromUrl = new URLSearchParams(window.location.search).get('id');
+  if (!idFromUrl) {
+    baseDataForReport = masterData;
+    return;
+  }
+
+  const currentUser = employeeData.find(emp => emp.idnv === idFromUrl && emp.email != '');
+  if (currentUser) {
+    if (currentUser.chucVu === 'leader') {
+      baseDataForReport = masterData.filter(r => (r.team || '').trim() === currentUser.team);
+    } else {
+      baseDataForReport = masterData.filter(r => (r.ten || '').trim() === currentUser.ten);
+    }
+  } else {
+    baseDataForReport = [];
+  }
+}
+    // =================================================================================
+    // --- IV. XỬ LÝ SỰ KIỆN VÀ BỘ LỌC ---
+    // =================================================================================
+    function handleFilterChange(e) {
+        const target = e.target;
+        if (target.closest('#MarketReport') && !target.id.startsWith('quick-date')) {
+            return; 
+        }
+
+        if (target.matches('select[id^="quick-date"]')) {
+            handleQuickDateChange(e);
+            return;
+        }
+      
+        const container = target.closest('.tab-content');
+        if (!container) return;
+        showLoader();
+        setTimeout(() => {
+            switch (container.id) {
+            case 'DetailedReport': handleTab1Filters(target); break;
+            case 'KpiReport': handleTab3Filters(target); break;
+            }
+            hideLoader();
+        }, 50);
+    }
+    
+    function handleQuickDateChange(event) {
+        const selection = event.target.value;
+        if (!selection) return;
+        const { startDate, endDate } = getDateRange(selection);
+        const formattedStart = startDate.toLocaleDateString('en-CA');
+        const formattedEnd = endDate.toLocaleDateString('en-CA');
+        
+        const tabId = event.target.id.includes('mkt') ? 'MarketReport' : 
+                      event.target.closest('.tab-content')?.id;
+
+        if (tabId === 'MarketReport') {
+            document.getElementById('start-date-mkt').value = formattedStart;
+            document.getElementById('end-date-mkt').value = formattedEnd;
+            applyTab4Filters();
+        }
+    }
+
+    function getFilteredData(tabPrefix) {
+      const isMktTab = tabPrefix === 'mkt';
+      const startDateVal = document.getElementById(`start-date-${tabPrefix}`).value;
+      const endDateVal = document.getElementById(`end-date-${tabPrefix}`).value;
+      const startDate = startDateVal ? new Date(startDateVal) : null;
+      if (startDate) startDate.setHours(0, 0, 0, 0);
+      const endDate = endDateVal ? new Date(endDateVal) : null;
+      if (endDate) endDate.setHours(23, 59, 59, 999);
+      if ((startDate && isNaN(startDate)) || (endDate && isNaN(endDate))) return [];
+
+      let selectedProducts, selectedMarkets, selectedCas, selectedTeams;
+      if (isMktTab) {
+        selectedProducts = Array.from(document.getElementById('product-filter-mkt').selectedOptions).map(opt => opt.value);
+        selectedMarkets = Array.from(document.getElementById('market-filter-mkt').selectedOptions).map(opt => opt.value);
+        selectedTeams = Array.from(document.getElementById('team-filter-mkt').selectedOptions).map(opt => opt.value);
+        selectedCas = Array.from(document.getElementById('ca-filter-mkt').selectedOptions).map(opt => opt.value);
+      }
+      
+      return baseDataForReport.filter(r => {
+        const date = new Date(r.ngay); date.setHours(0, 0, 0, 0);
+        if (!r.ngay || isNaN(date)) return false;
+        const isDateOk = (!startDate || date >= startDate) && (!endDate || date <= endDate);
+        const isProductOk = selectedProducts.length === 0 || selectedProducts.includes(r.sanPham);
+        const marketGroup = getMarketGroup(normalize(r.thiTruong));
+        const isMarketOk = selectedMarkets.length === 0 || selectedMarkets.includes(r.thiTruong) || selectedMarkets.includes(marketGroup);
+        const isCaOk = selectedCas.length === 0 || selectedCas.includes(r.ca);
+        const isTeamOk = selectedTeams.length === 0 || selectedTeams.includes(r.team);
+        return isDateOk && isProductOk && isMarketOk && isCaOk && isTeamOk;
+      });
+    }
+
+    function populateAllFilters() {
+      if (!masterData.length) return;
+      const products = [...new Set(masterData.map(r => r.sanPham).filter(Boolean))].sort();
+      const cas = [...new Set(masterData.map(r => r.ca).filter(Boolean))].sort();
+      const teams = [...new Set(masterData.map(r => r.team).filter(Boolean))].sort();
+      const markets = [...new Set(masterData.map(r => r.thiTruong).filter(Boolean))].sort();
+      
+      const createOptions = (items) => items.map(item => `<option value="${item}">${item}</option>`).join('');
+      document.getElementById('product-filter-mkt').innerHTML = createOptions(products);
+      document.getElementById('market-filter-mkt').innerHTML = createOptions(markets);
+      document.getElementById('team-filter-mkt').innerHTML = createOptions(teams);
+      document.getElementById('ca-filter-mkt').innerHTML = createOptions(cas);
+    }
+
+    // =================================================================================
+    // --- V. CÁC HÀM ÁP DỤNG BỘ LỌC CHO TỪNG TAB ---
+    // =================================================================================
+
+    function applyTab4Filters() {
+      showLoader();
+      try {
+        setTimeout(() => {
+          const startDateVal = document.getElementById('start-date-mkt').value;
+          const endDateVal = document.getElementById('end-date-mkt').value;
+          if (!startDateVal || !endDateVal) { hideLoader(); return; }
+          document.getElementById('report-date-mkt').textContent = `Từ ngày ${formatDate(new Date(startDateVal))} đến ngày ${formatDate(new Date(endDateVal))}`;
+          const filteredData = getFilteredData('mkt');
+          const asiaData = [], nonAsiaData = [];
+          const nonAsiaMarketsLower = MARKET_GROUPS['Ngoài Châu Á'].map(m => m.toLowerCase());
+          filteredData.forEach(record => {
+            if (nonAsiaMarketsLower.includes((record.thiTruong || '').toLowerCase())) nonAsiaData.push(record);
+            else asiaData.push(record);
+          });
+          renderMktTable(nonAsiaData, 'non-asia', true);
+          renderMktTable(asiaData, 'asia', true);
+          renderMktTable(filteredData, 'summary', false);
+          const chartSection = document.getElementById('mkt-charts-section');
+          if (filteredData.length > 0) {
+            chartSection.style.display = 'block'; renderMktCharts(filteredData);
+          } else {
+            chartSection.style.display = 'none';
+          }
+        }, 10);
+      } catch (error) {
+        console.error("Lỗi khi áp dụng bộ lọc Tab 4:", error);
+        alert("Đã có lỗi xảy ra.");
+      } finally {
+        setTimeout(hideLoader, 50);
+      }
+    }
+
+    // =================================================================================
+    // --- VI. CÁC HÀM TÍNH TOÁN VÀ TỔNG HỢP DỮ LIỆU ---
+    // =================================================================================
+
+    // =================================================================================
+    // --- VII. CÁC HÀM HIỂN THỊ DỮ LIỆU (RENDERING) ---
+    // =================================================================================
+    
+    function renderMktTable(data, prefix, showMarket) {
+        const tableBody = document.getElementById(`${prefix}-body-mkt`);
+        if (!tableBody) return;
+        document.getElementById(`${prefix}-market-mkt`).style.display = data.length > 0 ? 'block' : 'none';
+        if (data.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="10" class="text-center">Không có dữ liệu.</td></tr>`;
+            return;
+        }
+
+        const productGroups = {};
+        data.forEach(r => {
+            const productKey = r.sanPham || 'Chưa xác định';
+            const marketKey = showMarket ? (r.thiTruong || 'Không xác định') : '_';
+            if (!productGroups[productKey]) productGroups[productKey] = {};
+            if (!productGroups[productKey][marketKey]) {
+                productGroups[productKey][marketKey] = { cpqc: 0, soDon: 0, soDonThucTe: 0, soDonHuyThucTe: 0, soMessCmt: 0, dsChot: 0, dsChotThucTe: 0, dsHoanHuyThucTe: 0 };
+            }
+            const group = productGroups[productKey][marketKey];
+            group.cpqc += r.cpqc; group.soDon += r.soDon; group.soDonThucTe += r.soDonThucTe;
+            group.soDonHuyThucTe += r.soDonHuyThucTe; group.soMessCmt += r.soMessCmt;
+            group.dsChot += r.dsChot; group.dsChotThucTe += r.dsChotThucTe; group.dsHoanHuyThucTe += r.dsHoanHuyThucTe;
+        });
+
+        let grandTotal = { cpqc: 0, soDon: 0, soDonThucTe: 0, soDonHuyThucTe: 0, soMessCmt: 0, dsChot: 0, dsChotThucTe: 0, dsHoanHuyThucTe: 0 };
+        let tableHtml = '';
+        Object.keys(productGroups).sort().forEach(product => {
+            const markets = productGroups[product];
+            const sortedMarkets = Object.keys(markets).sort();
+            let productTotal = { cpqc: 0, soDon: 0, soDonThucTe: 0, soDonHuyThucTe: 0, soMessCmt: 0, dsChot: 0, dsChotThucTe: 0, dsHoanHuyThucTe: 0 };
+            
+            const isSingleEntryProduct = sortedMarkets.length === 1;
+            let rowspan = (showMarket && isSingleEntryProduct) ? 1 : sortedMarkets.length + (showMarket && sortedMarkets.length > 1 ? 1 : 0);
+
+            sortedMarkets.forEach((market, index) => {
+                const marketData = markets[market];
+                const rowClass = (showMarket && isSingleEntryProduct) ? 'highlight' : '';
+                tableHtml += createMktRow(index === 0 ? product : null, market, marketData, showMarket, rowClass, rowspan);
+                Object.keys(productTotal).forEach(key => productTotal[key] += marketData[key]);
+            });
+            if (showMarket && sortedMarkets.length > 1) {
+                tableHtml += createMktRow(null, 'Tổng', productTotal, showMarket, 'highlight');
+            }
+            Object.keys(grandTotal).forEach(key => grandTotal[key] += productTotal[key]);
+        });
+        tableBody.innerHTML = tableHtml + createMktRow('TỔNG CỘNG', '', grandTotal, showMarket, 'total-row');
+    }
+
+    function createMktRow(productName, marketName, data, showMarket, className = '', rowspan = 0) {
+        const dsSauHoanHuyThucTe = data.dsChotThucTe - data.dsHoanHuyThucTe;
+        const costPercent = dsSauHoanHuyThucTe > 0 ? data.cpqc / dsSauHoanHuyThucTe : 0;
+        const cps = data.soDon ? data.cpqc / data.soDon : 0;
+        const avgOrderValue = data.soDon ? dsSauHoanHuyThucTe / data.soDon : 0;
+        const soDonThucTeAfterCancel = (data.soDonThucTe || 0) - (data.soDonHuyThucTe || 0);
+        const closingRateThucTe = data.soMessCmt ? soDonThucTeAfterCancel / data.soMessCmt : 0;
+        const rateThucTeClass = closingRateThucTe > 0.1 ? 'bg-green' : (closingRateThucTe > 0.05 ? 'bg-yellow' : '');
+        const isTotalRow = className.includes('total-row');
+        
+        let productCell = '';
+        if (productName) {
+            const rowspanAttr = rowspan > 1 ? `rowspan="${rowspan}"` : '';
+            productCell = isTotalRow ? `<td class="total-label" colspan="2">${productName}</td>` : `<td class="text-left" ${rowspanAttr}>${productName}</td>`;
+        }
+        const marketCell = showMarket && !isTotalRow ? `<td class="text-left">${marketName}</td>` : (isTotalRow ? '' : '<td></td>');
+        return `<tr class="${className}">
+            ${productCell} ${marketName === 'Tổng' || !showMarket || isTotalRow ? '' : marketCell}
+            ${marketName === 'Tổng' ? `<td class="text-left">${marketName}</td>`: ''}
+            ${!showMarket && !isTotalRow ? '<td></td>' : ''}
+            <td>${formatCurrency(data.cpqc)}</td>
+            <td class="text-center">${formatNumber(data.soMessCmt)}</td>
+            <td class="text-center">${formatNumber(soDonThucTeAfterCancel)}</td>
+            <td>${formatCurrency(dsSauHoanHuyThucTe)}</td>
+            <td class="text-center">${formatPercent(costPercent)}</td>
+            <td>${formatCurrency(cps)}</td><td>${formatCurrency(avgOrderValue)}</td>
+            <td class="text-center ${rateThucTeClass}">${formatPercent(closingRateThucTe)}</td></tr>`;
+    }
+
+    // =================================================================================
+    // --- VIII. LOGIC SẮP XẾP BẢNG ---
+    // =================================================================================
+  
+    // =================================================================================
+    // --- IX. LOGIC TAB VÀ BIỂU ĐỒ ---
+    // =================================================================================
+    function initMarketReportCharts() {
+      charts.mktProductSalesChart = createBarChart('mktProductSalesChart', 'Doanh số sau HH (TT) theo SP');
+      charts.mktProductDsChotChart = createBarChart('mktProductDsChotChart', 'Doanh số Chốt (TT) theo SP');
+      charts.mktProductCpqcChart = createBarChart('mktProductCpqcChart', 'Chi phí Quảng cáo theo SP');
+      charts.mktProductCpsChart = createBarChart('mktProductCpsChart', 'Chi phí trên đơn (CPS) theo SP');
+      charts.mktProductClosingRateChart = createPieChart('mktProductClosingRateChart', 'Tỉ lệ chốt (TT) (%) theo SP');
+    }
+
+    function renderMktCharts(data) {
+        if (!charts.mktProductSalesChart) return;
+        const productMetrics = {};
+        data.forEach(r => {
+            const p = r.sanPham || 'Chưa xác định';
+            if (!productMetrics[p]) {
+                productMetrics[p] = { cpqc: 0, soDon: 0, soDonThucTe: 0, soDonHuyThucTe: 0, soMessCmt: 0, dsChotThucTe: 0, dsHoanHuyThucTe: 0 };
+            }
+            productMetrics[p].cpqc += r.cpqc; productMetrics[p].soDon += r.soDon;
+            productMetrics[p].soDonThucTe += r.soDonThucTe; productMetrics[p].soDonHuyThucTe += r.soDonHuyThucTe;
+            productMetrics[p].soMessCmt += r.soMessCmt; productMetrics[p].dsChotThucTe += r.dsChotThucTe;
+            productMetrics[p].dsHoanHuyThucTe += r.dsHoanHuyThucTe;
+        });
+
+        const sortedProducts = Object.entries(productMetrics)
+            .map(([name, metrics]) => {
+                const dsSauHhTt = metrics.dsChotThucTe - metrics.dsHoanHuyThucTe;
+                const soDonThucTeAfterCancel = metrics.soDonThucTe - metrics.soDonHuyThucTe;
+                return [name, { ...metrics, dsSauHhTt, soDonThucTeAfterCancel }];
+            })
+            .sort(([, a], [, b]) => b.dsSauHhTt - a.dsSauHhTt);
+
+        const labels = sortedProducts.map(([name]) => name);
+        const updateMktChartData = (chart, data) => {
+            chart.data.labels = labels; chart.data.datasets[0].data = data; chart.update();
+        };
+
+        updateMktChartData(charts.mktProductSalesChart, sortedProducts.map(([, p]) => p.dsSauHhTt));
+        updateMktChartData(charts.mktProductDsChotChart, sortedProducts.map(([, p]) => p.dsChotThucTe));
+        updateMktChartData(charts.mktProductCpqcChart, sortedProducts.map(([, p]) => p.cpqc));
+        updateMktChartData(charts.mktProductCpsChart, sortedProducts.map(([, p]) => (p.soDonThucTeAfterCancel > 0 ? p.cpqc / p.soDonThucTeAfterCancel : 0)));
+        updateMktChartData(charts.mktProductClosingRateChart, sortedProducts.map(([, p]) => (p.soMessCmt > 0 ? (p.soDonThucTeAfterCancel / p.soMessCmt) * 100 : 0)));
+    }
+
+    function createBarChart(canvasId, chartTitle) {
+        return new Chart(document.getElementById(canvasId), {
+            type: 'bar', data: { labels: [], datasets: [{ backgroundColor: CHART_COLORS, data: [] }] },
+            options: {
+                responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+                plugins: {
+                    legend: { display: false }, title: { display: true, text: chartTitle, font: { size: 16 } },
+                    datalabels: { anchor: 'end', align: 'right', offset: 4, color: '#333', font: { weight: '600' }, formatter: formatPriceShort }
+                },
+                scales: { x: { display: false }, y: { grid: { display: false } } }
+            }
+        });
+    }
+    function createPieChart(canvasId, chartTitle) {
+        return new Chart(document.getElementById(canvasId), {
+            type: 'doughnut', data: { labels: [], datasets: [{ backgroundColor: CHART_COLORS, data: [] }] },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' }, title: { display: true, text: chartTitle, font: { size: 16 } },
+                    tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${ctx.raw.toFixed(2)}%` } },
+                    datalabels: { color: '#fff', font: { weight: 'bold' }, formatter: (value) => `${value.toFixed(2)}%` }
+                }
+            }
+        });
+    }
+    
+    // =================================================================================
+    // --- X. CÁC HÀM TIỆN ÍCH (UTILITIES) ---
+    // =================================================================================
+    const loader = document.getElementById('loading-overlay');
+    const showLoader = () => loader.classList.add('visible');
+    const hideLoader = () => loader.classList.remove('visible');
+    function normalize(s) { return (s || '').trim().toLowerCase(); }
+    function getMarketGroup(normalizedMarket) {
+        for (const group in MARKET_GROUPS) {
+            if (MARKET_GROUPS[group].map(normalize).includes(normalizedMarket)) return group;
+        }
+        return null;
+    }
+    function formatDate(dateObj) {
+        if (!(dateObj instanceof Date) || isNaN(dateObj)) return '';
+        return `${String(dateObj.getDate()).padStart(2, '0')}/${String(dateObj.getMonth() + 1).padStart(2, '0')}/${dateObj.getFullYear()}`;
+    }
+    function formatCurrency(v) { return Number(v || 0).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }); }
+    function formatNumber(v) { return Number(v || 0).toLocaleString('vi-VN'); }
+    function formatPriceShort(v) {
+        const n = Number(v || 0); if (isNaN(n)) return '0';
+        if (Math.abs(n) >= 1e9) return (n / 1e9).toFixed(1).replace(/\.0$/, '') + ' tỷ';
+        if (Math.abs(n) >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, '') + ' tr';
+        if (Math.abs(n) >= 1e3) return (n / 1e3).toFixed(0) + ' k';
+        return n.toLocaleString('vi-VN');
+    }
+    function formatPercent(v) {
+        if (!isFinite(v)) return '0.00%';
+        return `${(Number(v || 0) * 100).toFixed(2)}%`;
+    }
+
+    function getDateRange(selection) {
+      const now = new Date();
+      let startDate, endDate = new Date(now);
+      const currentYear = now.getFullYear(), currentMonth = now.getMonth(), currentDay = now.getDay();
+      const dayOfWeek = currentDay === 0 ? 6 : currentDay - 1;
+      switch (selection) {
+        case 'today': startDate = new Date(now.setHours(0, 0, 0, 0)); endDate = new Date(now.setHours(23, 59, 59, 999)); break;
+        case 'yesterday': startDate = new Date(new Date().setDate(new Date().getDate() - 1)); startDate.setHours(0, 0, 0, 0); endDate = new Date(startDate); endDate.setHours(23, 59, 59, 999); break;
+        case 'thisWeek': startDate = new Date(now.setDate(now.getDate() - dayOfWeek)); startDate.setHours(0, 0, 0, 0); endDate = new Date(startDate); endDate.setDate(startDate.getDate() + 6); endDate.setHours(23, 59, 59, 999); break;
+        case 'lastWeek': startDate = new Date(); startDate.setDate(new Date().getDate() - dayOfWeek - 7); startDate.setHours(0, 0, 0, 0); endDate = new Date(startDate); endDate.setDate(startDate.getDate() + 6); endDate.setHours(23, 59, 59, 999); break;
+        case 'nextWeek': startDate = new Date(); startDate.setDate(new Date().getDate() - dayOfWeek + 7); startDate.setHours(0, 0, 0, 0); endDate = new Date(startDate); endDate.setDate(startDate.getDate() + 6); endDate.setHours(23, 59, 59, 999); break;
+        case 'thisMonth': startDate = new Date(currentYear, currentMonth, 1); endDate = new Date(currentYear, currentMonth + 1, 0); break;
+        default:
+          if (selection.startsWith('month_')) {
+            const month = parseInt(selection.split('_')[1], 10) - 1;
+            startDate = new Date(currentYear, month, 1); endDate = new Date(currentYear, month + 1, 0);
+          } else if (selection.startsWith('quarter_')) {
+            const quarter = parseInt(selection.split('_')[1], 10);
+            const startMonth = (quarter - 1) * 3;
+            startDate = new Date(currentYear, startMonth, 1); endDate = new Date(currentYear, startMonth + 3, 0);
+          }
+          break;
+      }
+      return { startDate, endDate };
+    }
+  </script>
+</body>
+
+</html>
+
