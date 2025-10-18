@@ -454,7 +454,7 @@ function setupInitialReportView() {
 
             sortedMarkets.forEach((market, index) => {
                 const marketData = markets[market];
-                const rowClass = (showMarket && isSingleEntryProduct) ? 'highlight' : '';
+                const rowClass = '';
                 tableHtml += createMktRow(index === 0 ? product : null, market, marketData, showMarket, rowClass, rowspan);
                 Object.keys(productTotal).forEach(key => productTotal[key] += marketData[key]);
             });
