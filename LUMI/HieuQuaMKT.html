@@ -414,7 +414,7 @@ function setupInitialReportView() {
     // --- VII. CÁC HÀM HIỂN THỊ DỮ LIỆU (RENDERING) ---
     // =================================================================================
     
-    // --- MODIFICATION: renderMktTable updated to show TONG section *only* with data ---
+    // --- MODIFICATION: renderMktTable updated to remove 'total-row' class from TONG section ---
     function renderMktTable(data, prefix, showMarket) {
         const tableBody = document.getElementById(`${prefix}-body-mkt`);
         if (!tableBody) return;
@@ -469,10 +469,8 @@ function setupInitialReportView() {
             const marketTotals = {};
             const targetMarketList = (prefix === 'non-asia' ? MARKET_GROUPS['Ngoài Châu Á'] : MARKET_GROUPS['Châu Á']);
 
-            // Calculate marketTotals by iterating through productGroups
             Object.values(productGroups).forEach(markets => {
                 Object.entries(markets).forEach(([marketName, marketData]) => {
-                    // Only include markets that belong to this group
                     if (targetMarketList.includes(marketName)) {
                         if (!marketTotals[marketName]) {
                              marketTotals[marketName] = { ...emptyStats };
@@ -482,14 +480,11 @@ function setupInitialReportView() {
                 });
             });
 
-            // Get the list of markets that *actually have data*
-            // Filter out markets where all stats are zero
             const marketsToRender = Object.keys(marketTotals)
                 .filter(market => Object.values(marketTotals[market]).some(val => val !== 0))
                 .sort();
 
-            // Build the HTML for the new 'TỔNG' section
-            if (marketsToRender.length > 0) { // Only build if there's anything to show
+            if (marketsToRender.length > 0) {
                 marketsToRender.forEach((marketName, index) => {
                     const data = marketTotals[marketName]; 
                     const dsSauHoanHuyThucTe = data.dsChotThucTe - data.dsHoanHuyThucTe;
@@ -500,8 +495,10 @@ function setupInitialReportView() {
                     const closingRateThucTe = data.soMessCmt ? soDonThucTeAfterCancel / data.soMessCmt : 0;
                     const rateThucTeClass = closingRateThucTe > 0.1 ? 'bg-green' : (closingRateThucTe > 0.05 ? 'bg-yellow' : '');
 
-                    tableHtml += `<tr class="total-row">`;
+                    // --- Removed 'total-row' class from this <tr> ---
+                    tableHtml += `<tr>`;
                     if (index === 0) {
+                        // Added 'total-label' class for consistent styling
                         tableHtml += `<td class="total-label" rowspan="${marketsToRender.length}" style="vertical-align: middle;">TỔNG</td>`;
                     }
                     tableHtml += `
@@ -516,16 +513,16 @@ function setupInitialReportView() {
                     </tr>`;
                 });
             } else {
-                 // Fallback: If no markets had data, just show the simple TONG row
-                 tableHtml += createMktRow('TỔNG', '', grandTotal, showMarket, 'total-row');
+                 // Fallback: Show simple TONG row, but *without* 'total-row' class
+                 tableHtml += createMktRow('TỔNG', '', grandTotal, showMarket, ''); // Pass empty class
             }
         } else {
-            // For the summary table (where showMarket = false), just show the simple 'TỔNG' row
-            tableHtml += createMktRow('TỔNG', '', grandTotal, showMarket, 'total-row');
+            // For the summary table, show simple TONG row *without* 'total-row' class
+            tableHtml += createMktRow('TỔNG', '', grandTotal, showMarket, ''); // Pass empty class
         }
         // --- END of new 'TỔNG' section logic ---
 
-        // 'TỔNG CỘNG' row uses the grandTotal calculated earlier
+        // 'TỔNG CỘNG' row *keeps* 'total-row' to remain yellow
         const tongCongRowHtml = createMktRow('TỔNG CỘNG', '', grandTotal, showMarket, 'total-row');
         
         tableBody.innerHTML = tableHtml + tongCongRowHtml;
@@ -541,25 +538,43 @@ function setupInitialReportView() {
         const soDonThucTeAfterCancel = (data.soDonThucTe || 0) - (data.soDonHuyThucTe || 0);
         const closingRateThucTe = data.soMessCmt ? soDonThucTeAfterCancel / data.soMessCmt : 0;
         const rateThucTeClass = closingRateThucTe > 0.1 ? 'bg-green' : (closingRateThucTe > 0.05 ? 'bg-yellow' : '');
+        // isTotalRow is now determined *only* by the className passed in
         const isTotalRow = className.includes('total-row');
         
         let productCell = '';
         if (productName) {
             const rowspanAttr = rowspan > 1 ? `rowspan="${rowspan}"` : '';
-            // This is the simple logic: total rows get colspan="2"
-            productCell = isTotalRow ? `<td class="total-label" colspan="2">${productName}</td>` : `<td class="text-left" ${rowspanAttr}>${productName}</td>`;
+            // Use 'total-label' class if 'total-row' or 'highlight' is present
+            const labelClass = (isTotalRow || className.includes('highlight')) ? 'total-label' : 'text-left';
+            // Use colspan="2" only if it's a total row *and* we're not showing markets (or it's 'Tổng')
+            const useColspan = (isTotalRow || marketName === 'Tổng') && (!showMarket || marketName === 'Tổng' || productName === 'TỔNG CỘNG' || productName === 'TỔNG');
+
+            productCell = useColspan 
+                ? `<td class="${labelClass}" colspan="2">${productName}</td>`
+                : `<td class="${labelClass}" ${rowspanAttr}>${productName}</td>`;
         }
         
-        const marketCell = showMarket && !isTotalRow ? `<td class="text-left">${marketName}</td>` : (isTotalRow ? '' : '<td></td>');
+        const marketCell = showMarket && !isTotalRow && marketName !== 'Tổng' ? `<td class="text-left">${marketName}</td>` : (isTotalRow ? '' : '<td></td>');
         
-        let rowHtml = `<tr class="${className}">`;
+        let rowHtml = `<tr class="${className}">`; // className could be '', 'highlight', or 'total-row'
         rowHtml += productCell;
         
         // Standard logic for the second column
-        rowHtml += (marketName === 'Tổng' || !showMarket || isTotalRow ? '' : marketCell);
-        rowHtml += (marketName === 'Tổng' ? `<td class="text-left">${marketName}</td>`: '');
-        rowHtml += (!showMarket && !isTotalRow ? '<td></td>' : '');
+        const showMarketCell = marketName === 'Tổng' || (!showMarket && !productName.includes('TỔNG'));
         
+        if (marketName === 'Tổng') {
+            rowHtml += `<td class="text-left">${marketName}</td>`;
+        } else if (!showMarket && !isTotalRow && productName) {
+             rowHtml += '<td></td>';
+        } else if (showMarket && !isTotalRow && !productCell.includes('rowspan')) {
+            // This handles the market cell for rows after the first one in a rowspan
+            rowHtml += marketCell;
+        } else if (isTotalRow && !productCell.includes('colspan')) {
+            // This case should not be hit if logic is right, but as a fallback
+        } else if (showMarket && productCell.includes('rowspan')) {
+             rowHtml += marketCell;
+        }
+
         rowHtml += `
             <td>${formatCurrency(data.cpqc)}</td>
             <td class="text-center">${formatNumber(data.soMessCmt)}</td>

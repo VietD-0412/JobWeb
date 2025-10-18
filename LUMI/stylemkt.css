@@ -128,10 +128,14 @@
       font-weight: 700;
     }
     
-    .total-row .total-label {
+    /* --- MODIFICATION START --- */
+    /* This rule now applies to ANY cell with .total-label,
+       not just ones inside a .total-row */
+    .total-label {
       text-transform: uppercase;
       text-align: left !important;
     }
+    /* --- MODIFICATION END --- */
 
     .total-row .total-value {
       text-align: right !important;
