@@ -15,11 +15,6 @@
 <body>
   <div id="loading-overlay">Đang tải dữ liệu...</div>
 
-  <!-- TAB 1: BÁO CÁO CHI TIẾT -->
-  
-  <!-- TAB 2: BÁO CÁO KPI -->
-  
-  <!-- TAB 3: HIỆU QUẢ MKT (GIAO DIỆN MỚI) -->
   <div id="MarketReport" class="tab-content" style="display: block;">
     <div class="report-header">
       <div class="report-title">THỐNG KÊ HIỆU QUẢ MARKETING THEO SẢN PHẨM & THỊ TRƯỜNG</div>
@@ -150,9 +145,6 @@
       </div>
     </div>
   </div>
-  <!-- TAB MỚI: Nội dung báo cáo thủ công -->
-
-
   <script>
     // =================================================================================
     // --- I. KHAI BÁO BIẾN TOÀN CỤC & CẤU HÌNH ---
@@ -169,7 +161,7 @@
 
     const MARKET_GROUPS = {
       'Châu Á': ['Hàn Quốc', 'Nhật Bản', 'VN'],
-      'Ngoài Châu Á': ['Úc', 'US', 'Canada']
+      'Ngoài Châu Á': ['US', 'Canada', 'EU', 'Úc', 'Anh']
     };
 
     // --- Biến lưu trữ trạng thái (State) của ứng dụng ---
@@ -187,7 +179,7 @@
       setupEventListeners();
       setDefaultDates();
       fetchAndProcessData();
-      document.getElementById("defaultOpen").click();
+      // document.getElementById("defaultOpen").click(); // This element doesn't exist
     });
 
     function setDefaultDates() {
@@ -265,7 +257,7 @@
       } catch (err) {
         console.error("Lỗi tải dữ liệu:", err);
         alert('Không thể tải dữ liệu từ API. Vui lòng kiểm tra lại.');
-        document.getElementById('report-title-tab1').textContent = `LỖI TẢI DỮ LIỆU`;
+        // document.getElementById('report-title-tab1').textContent = `LỖI TẢI DỮ LIỆU`;
       } finally {
         hideLoader();
       }
@@ -307,10 +299,10 @@ function setupInitialReportView() {
         if (!container) return;
         showLoader();
         setTimeout(() => {
-            switch (container.id) {
-            case 'DetailedReport': handleTab1Filters(target); break;
-            case 'KpiReport': handleTab3Filters(target); break;
-            }
+            // switch (container.id) {
+            // case 'DetailedReport': handleTab1Filters(target); break;
+            // case 'KpiReport': handleTab3Filters(target); break;
+            // }
             hideLoader();
         }, 50);
     }
@@ -422,6 +414,7 @@ function setupInitialReportView() {
     // --- VII. CÁC HÀM HIỂN THỊ DỮ LIỆU (RENDERING) ---
     // =================================================================================
     
+    // --- MODIFICATION: renderMktTable updated to show TONG section *only* with data ---
     function renderMktTable(data, prefix, showMarket) {
         const tableBody = document.getElementById(`${prefix}-body-mkt`);
         if (!tableBody) return;
@@ -432,12 +425,14 @@ function setupInitialReportView() {
         }
 
         const productGroups = {};
+        const emptyStats = { cpqc: 0, soDon: 0, soDonThucTe: 0, soDonHuyThucTe: 0, soMessCmt: 0, dsChot: 0, dsChotThucTe: 0, dsHoanHuyThucTe: 0 };
+
         data.forEach(r => {
             const productKey = r.sanPham || 'Chưa xác định';
             const marketKey = showMarket ? (r.thiTruong || 'Không xác định') : '_';
             if (!productGroups[productKey]) productGroups[productKey] = {};
             if (!productGroups[productKey][marketKey]) {
-                productGroups[productKey][marketKey] = { cpqc: 0, soDon: 0, soDonThucTe: 0, soDonHuyThucTe: 0, soMessCmt: 0, dsChot: 0, dsChotThucTe: 0, dsHoanHuyThucTe: 0 };
+                productGroups[productKey][marketKey] = { ...emptyStats };
             }
             const group = productGroups[productKey][marketKey];
             group.cpqc += r.cpqc; group.soDon += r.soDon; group.soDonThucTe += r.soDonThucTe;
@@ -445,12 +440,14 @@ function setupInitialReportView() {
             group.dsChot += r.dsChot; group.dsChotThucTe += r.dsChotThucTe; group.dsHoanHuyThucTe += r.dsHoanHuyThucTe;
         });
 
-        let grandTotal = { cpqc: 0, soDon: 0, soDonThucTe: 0, soDonHuyThucTe: 0, soMessCmt: 0, dsChot: 0, dsChotThucTe: 0, dsHoanHuyThucTe: 0 };
+        let grandTotal = { ...emptyStats };
         let tableHtml = '';
+        
+        // This loop builds the main product rows (UNCHANGED)
         Object.keys(productGroups).sort().forEach(product => {
             const markets = productGroups[product];
-            const sortedMarkets = Object.keys(markets).sort();
-            let productTotal = { cpqc: 0, soDon: 0, soDonThucTe: 0, soDonHuyThucTe: 0, soMessCmt: 0, dsChot: 0, dsChotThucTe: 0, dsHoanHuyThucTe: 0 };
+            const sortedMarkets = Object.keys(markets).sort(); 
+            let productTotal = { ...emptyStats };
             
             const isSingleEntryProduct = sortedMarkets.length === 1;
             let rowspan = (showMarket && isSingleEntryProduct) ? 1 : sortedMarkets.length + (showMarket && sortedMarkets.length > 1 ? 1 : 0);
@@ -466,9 +463,76 @@ function setupInitialReportView() {
             }
             Object.keys(grandTotal).forEach(key => grandTotal[key] += productTotal[key]);
         });
-        tableBody.innerHTML = tableHtml + createMktRow('TỔNG CỘNG', '', grandTotal, showMarket, 'total-row');
-    }
 
+        // --- START of new 'TỔNG' section logic (MODIFIED) ---
+        if (showMarket) { 
+            const marketTotals = {};
+            const targetMarketList = (prefix === 'non-asia' ? MARKET_GROUPS['Ngoài Châu Á'] : MARKET_GROUPS['Châu Á']);
+
+            // Calculate marketTotals by iterating through productGroups
+            Object.values(productGroups).forEach(markets => {
+                Object.entries(markets).forEach(([marketName, marketData]) => {
+                    // Only include markets that belong to this group
+                    if (targetMarketList.includes(marketName)) {
+                        if (!marketTotals[marketName]) {
+                             marketTotals[marketName] = { ...emptyStats };
+                        }
+                        Object.keys(emptyStats).forEach(key => marketTotals[marketName][key] += marketData[key]);
+                    }
+                });
+            });
+
+            // Get the list of markets that *actually have data*
+            // Filter out markets where all stats are zero
+            const marketsToRender = Object.keys(marketTotals)
+                .filter(market => Object.values(marketTotals[market]).some(val => val !== 0))
+                .sort();
+
+            // Build the HTML for the new 'TỔNG' section
+            if (marketsToRender.length > 0) { // Only build if there's anything to show
+                marketsToRender.forEach((marketName, index) => {
+                    const data = marketTotals[marketName]; 
+                    const dsSauHoanHuyThucTe = data.dsChotThucTe - data.dsHoanHuyThucTe;
+                    const costPercent = dsSauHoanHuyThucTe > 0 ? data.cpqc / dsSauHoanHuyThucTe : 0;
+                    const cps = data.soDon ? data.cpqc / data.soDon : 0;
+                    const avgOrderValue = data.soDon ? dsSauHoanHuyThucTe / data.soDon : 0;
+                    const soDonThucTeAfterCancel = (data.soDonThucTe || 0) - (data.soDonHuyThucTe || 0);
+                    const closingRateThucTe = data.soMessCmt ? soDonThucTeAfterCancel / data.soMessCmt : 0;
+                    const rateThucTeClass = closingRateThucTe > 0.1 ? 'bg-green' : (closingRateThucTe > 0.05 ? 'bg-yellow' : '');
+
+                    tableHtml += `<tr class="total-row">`;
+                    if (index === 0) {
+                        tableHtml += `<td class="total-label" rowspan="${marketsToRender.length}" style="vertical-align: middle;">TỔNG</td>`;
+                    }
+                    tableHtml += `
+                        <td class="text-left">${marketName}</td>
+                        <td>${formatCurrency(data.cpqc)}</td>
+                        <td class="text-center">${formatNumber(data.soMessCmt)}</td>
+                        <td class="text-center">${formatNumber(soDonThucTeAfterCancel)}</td>
+                        <td>${formatCurrency(dsSauHoanHuyThucTe)}</td>
+                        <td class="text-center">${formatPercent(costPercent)}</td>
+                        <td>${formatCurrency(cps)}</td><td>${formatCurrency(avgOrderValue)}</td>
+                        <td class="text-center ${rateThucTeClass}">${formatPercent(closingRateThucTe)}</td>
+                    </tr>`;
+                });
+            } else {
+                 // Fallback: If no markets had data, just show the simple TONG row
+                 tableHtml += createMktRow('TỔNG', '', grandTotal, showMarket, 'total-row');
+            }
+        } else {
+            // For the summary table (where showMarket = false), just show the simple 'TỔNG' row
+            tableHtml += createMktRow('TỔNG', '', grandTotal, showMarket, 'total-row');
+        }
+        // --- END of new 'TỔNG' section logic ---
+
+        // 'TỔNG CỘNG' row uses the grandTotal calculated earlier
+        const tongCongRowHtml = createMktRow('TỔNG CỘNG', '', grandTotal, showMarket, 'total-row');
+        
+        tableBody.innerHTML = tableHtml + tongCongRowHtml;
+    }
+    // --- END MODIFICATION ---
+
+    // --- createMktRow function is UNCHANGED (reverted to simple logic) ---
     function createMktRow(productName, marketName, data, showMarket, className = '', rowspan = 0) {
         const dsSauHoanHuyThucTe = data.dsChotThucTe - data.dsHoanHuyThucTe;
         const costPercent = dsSauHoanHuyThucTe > 0 ? data.cpqc / dsSauHoanHuyThucTe : 0;
@@ -482,21 +546,33 @@ function setupInitialReportView() {
         let productCell = '';
         if (productName) {
             const rowspanAttr = rowspan > 1 ? `rowspan="${rowspan}"` : '';
+            // This is the simple logic: total rows get colspan="2"
             productCell = isTotalRow ? `<td class="total-label" colspan="2">${productName}</td>` : `<td class="text-left" ${rowspanAttr}>${productName}</td>`;
         }
+        
         const marketCell = showMarket && !isTotalRow ? `<td class="text-left">${marketName}</td>` : (isTotalRow ? '' : '<td></td>');
-        return `<tr class="${className}">
-            ${productCell} ${marketName === 'Tổng' || !showMarket || isTotalRow ? '' : marketCell}
-            ${marketName === 'Tổng' ? `<td class="text-left">${marketName}</td>`: ''}
-            ${!showMarket && !isTotalRow ? '<td></td>' : ''}
+        
+        let rowHtml = `<tr class="${className}">`;
+        rowHtml += productCell;
+        
+        // Standard logic for the second column
+        rowHtml += (marketName === 'Tổng' || !showMarket || isTotalRow ? '' : marketCell);
+        rowHtml += (marketName === 'Tổng' ? `<td class="text-left">${marketName}</td>`: '');
+        rowHtml += (!showMarket && !isTotalRow ? '<td></td>' : '');
+        
+        rowHtml += `
             <td>${formatCurrency(data.cpqc)}</td>
             <td class="text-center">${formatNumber(data.soMessCmt)}</td>
             <td class="text-center">${formatNumber(soDonThucTeAfterCancel)}</td>
             <td>${formatCurrency(dsSauHoanHuyThucTe)}</td>
             <td class="text-center">${formatPercent(costPercent)}</td>
             <td>${formatCurrency(cps)}</td><td>${formatCurrency(avgOrderValue)}</td>
-            <td class="text-center ${rateThucTeClass}">${formatPercent(closingRateThucTe)}</td></tr>`;
+            <td class="text-center ${rateThucTeClass}">${formatPercent(closingRateThucTe)}</td>
+        </tr>`;
+        
+        return rowHtml;
     }
+    // --- END createMktRow ---
 
     // =================================================================================
     // --- VIII. LOGIC SẮP XẾP BẢNG ---
@@ -634,4 +710,3 @@ function setupInitialReportView() {
 </body>
 
 </html>
-
