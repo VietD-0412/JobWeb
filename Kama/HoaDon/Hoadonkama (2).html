@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biokama Invoices</title>
+    <style>
+        /* General Page Setup */
+        body {
+            font-family: 'Arial Black', 'Segoe UI', Arial, sans-serif;
+            background-color: #e9e9e9;
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact;
+            color-adjust: exact;
+            font-weight: 900;
+            color: #000;
+        }
+
+        /* Wrapper for all invoices on the screen */
+        #invoices-wrapper {
+            width: 50%;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* Invoice Container */
+        .invoice-container {
+            width: 80mm;
+            height: auto;
+            border: 1px solid #d1d1d1;
+            background-color: #ffffff;
+            padding: 5mm;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Background Watermark Logo */
+        .background-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120%;
+            height: auto;
+            opacity: 0.5;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* Header Section */
+        .invoice-header {
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .top-left-logo {
+            width: 20mm;
+            height: auto;
+
+        }
+
+        .company-name {
+            font-size: 20pt;
+            display: inline-block;
+            padding-top: 5px;
+            margin-left: 5mm;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 5px;
+        }
+
+        /* Main Content Area */
+        .invoice-main {
+            position: relative;
+            z-index: 1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10pt;
+        }
+
+        td,
+        th {
+            border: 1px solid #e0e0e0;
+            padding: 6px;
+            vertical-align: top;
+            word-wrap: break-word;
+            font-weight: 900;
+        }
+
+        th {
+            background-color: #f9f9f9;
+            text-align: left;
+        }
+
+        .section-title {
+            font-size: 11pt;
+            padding-top: 10px;
+            padding-bottom: 5px;
+            border: none;
+        }
+
+        .phone-number {
+            font-size: 140%;
+        }
+
+        /* Footer Section */
+        .invoice-footer {
+            margin-top: auto;
+            padding-top: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-left-content {
+            flex-grow: 1;
+            width: 100%;
+        }
+
+        .summary-container {
+            display: flex;
+            width: 100%;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+        }
+
+        .summary-item {
+            flex: 1;
+            text-align: center;
+            padding: 8px 4px;
+        }
+
+        .summary-item:not(:last-child) {
+            border-right: 1px solid #e0e0e0;
+        }
+
+        .summary-label {
+            font-size: 8pt;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .summary-value {
+            font-size: 11pt;
+            font-weight: 900;
+        }
+
+        .cod-item {
+            background-color: #e8f5e9;
+        }
+
+        .cod-item .summary-value {
+            font-size: 14pt;
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 10px;
+        }
+
+        .footer-text {
+            text-align: left;
+            padding-top: 10px;
+        }
+
+        .thank-you {
+            font-size: 11pt;
+        }
+
+        .contact-us {
+            font-size: 8pt;
+        }
+
+        .bottom-right-image {
+            width: 22mm;
+            height: 22mm;
+            flex-shrink: 0;
+            /* margin-top: 10px; */
+        }
+
+        /* Status Message Style */
+        #status-message {
+            text-align: center;
+            font-size: 16px;
+            padding: 30px;
+            font-style: italic;
+            color: #555;
+        }
+
+        .error {
+            color: #d9534f;
+            font-weight: bold;
+        }
+
+        /* Print-specific Styles */
+        @media print {
+            body {
+                background-color: #fff;
+                padding: 0;
+                margin: 0;
+            }
+
+            #invoices-wrapper {
+                padding: 0;
+                gap: 0;
+            }
+
+            .invoice-container {
+                page-break-after: always;
+                box-shadow: none;
+                border: none;
+                margin: 0;
+                width: 100vw;
+                height: 100vh;
+            }
+
+            #status-message {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="status-message">Đang tải dữ liệu hóa đơn...</div>
+    <div id="invoices-wrapper">
+    </div>
+
+    <script>
+        // PASTE YOUR NEWEST DEPLOYED WEB APP URL HERE
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbyKjBkwJR6OdGt4hB45Kf6yBRX0l7kUicHUK9XY1vLU4iho9uk--YvDirw-CuG7rGjc/exec";
+
+        const COLUMN_CONFIG = {
+            ORDER_CODE: 'MÃ ĐƠN HÀNG',
+            CUSTOMER_NAME: 'HỌ TÊN',
+            PHONE: 'SĐT',
+            ADDRESS: 'ĐỊA CHỈ',
+            SALES_REP: 'Sale',
+            SALES_REP_PHONE: 'SĐT sale',
+            MAIN_PRODUCT: 'SẢN PHẨM',
+            PREPAID: 'Đã thanh toán',
+            REMAINING: 'Còn lại',
+            SHIPPING_UNIT: 'ĐƠN VỊ VẬN CHUYỂN',
+            PRICE: 'GIÁ' // Cấu hình cho cột GIÁ
+        };
+
+        function parseToNumber(value) {
+            if (value === null || typeof value === 'undefined') return 0;
+            const cleanedValue = String(value).replace(/[^0-9.-]+/g, '');
+            return parseFloat(cleanedValue) || 0;
+        }
+
+        function formatCurrency(number) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(number);
+        }
+
+        async function generateInvoices() {
+            const wrapper = document.getElementById('invoices-wrapper');
+            const statusMsg = document.getElementById('status-message');
+            wrapper.innerHTML = '';
+
+            try {
+                const response = await fetch(webAppUrl);
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
+                }
+                const apiResponse = await response.json();
+
+                let orders = apiResponse.data;
+                if (!Array.isArray(orders)) {
+                    throw new Error("API response did not contain a valid 'data' array.");
+                }
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const idParam = urlParams.get('id');
+
+                if (idParam) {
+                    const desiredOrderCodes = idParam.split(',').map(code => code.trim().toUpperCase());
+                    orders = orders.filter(order =>
+                        desiredOrderCodes.includes(String(order[COLUMN_CONFIG.ORDER_CODE] || '').toUpperCase())
+                    );
+
+                    if (orders.length === 0) {
+                        statusMsg.textContent = `Không tìm thấy hóa đơn nào với các ID đã cung cấp: ${idParam}`;
+                        statusMsg.classList.add('error');
+                        return;
+                    }
+                }
+
+                let allInvoicesHTML = '';
+                orders.forEach(order => {
+                    const remainingAmount = parseToNumber(order[COLUMN_CONFIG.REMAINING]);
+                    const prepaidAmount = parseToNumber(order[COLUMN_CONFIG.PREPAID]);
+                    const totalAmount = remainingAmount + prepaidAmount;
+                    const priceAmount = parseToNumber(order[COLUMN_CONFIG.PRICE]); // Lấy giá trị từ cột 'GIÁ'
+
+                    const formattedTotalAmount = formatCurrency(totalAmount);
+                    const formattedPrepaidAmount = formatCurrency(prepaidAmount);
+                    const formattedCodAmount = formatCurrency(remainingAmount);
+                    const qrCodeData = String(order[COLUMN_CONFIG.ORDER_CODE] || '');
+
+                    let salesRepInfo = order[COLUMN_CONFIG.SALES_REP] || '';
+                    const salesRepPhone = order[COLUMN_CONFIG.SALES_REP_PHONE] || '';
+                    if (salesRepPhone) {
+                        salesRepInfo += `<br>${salesRepPhone}`;
+                    }
+                    
+                    // Sử dụng biến priceAmount cho cột Price của sản phẩm chính
+                    let productRowsHTML = `
+                        <tr>
+                            <td>${order[COLUMN_CONFIG.MAIN_PRODUCT] || ''}</td>
+                            <td>1</td>
+                            <td>${formatCurrency(priceAmount)}</td>
+                        </tr>
+                    `;
+
+                    // *** UPDATED CODE BLOCK STARTS HERE ***
+                    if (order.upsaleItems && Array.isArray(order.upsaleItems)) {
+                        order.upsaleItems.forEach(item => {
+                            // Lấy giá trị Price từ item, chuyển số và định dạng
+                            const upsalePriceAmount = parseToNumber(item['Price']);
+                            const formattedUpsalePrice = formatCurrency(upsalePriceAmount);
+
+                            productRowsHTML += `
+                                <tr>
+                                    <td>${item['Sản phẩm'] || ''}</td>
+                                    <td>${item['Quantity'] || 1}</td>
+                                    <td>${formattedUpsalePrice}</td>
+                                </tr>
+                            `;
+                        });
+                    }
+                    // *** UPDATED CODE BLOCK ENDS HERE ***
+
+                    allInvoicesHTML += `
+                        <div class="invoice-container">
+                             <img src="https://www.appsheet.com/template/gettablefileurl?appName=Appsheet-325045268&tableName=Kho%20%E1%BA%A3nh&fileName=Kho%20%E1%BA%A3nh_Images%2Fd3e93e8d.%E1%BA%A2nh.121830.png" alt="Background Logo" class="background-logo" onerror="this.style.display='none'">
+                            
+                            <header class="invoice-header">
+                                <img src="https://www.appsheet.com/template/gettablefileurl?appName=Appsheet-325045268&tableName=Kho%20%E1%BA%A3nh&fileName=Kho%20%E1%BA%A3nh_Images%2Fd3e93e8d.%E1%BA%A2nh.121830.png" alt="Biokama Logo" class="top-left-logo" onerror="this.style.display='none'">
+                                <div class="company-name">BIOKAMA</div>
+                            </header>
+
+                            <main class="invoice-main">
+                                <table>
+                                    <tbody>
+                                        <tr><td colspan="2" class="section-title">Customer Information:</td></tr>
+                                        <tr><td class="label">Name:</td><td>${order[COLUMN_CONFIG.CUSTOMER_NAME] || ''}</td></tr>
+                                        <tr><td class="label">Phone's number:</td><td class="phone-number">${order[COLUMN_CONFIG.PHONE] || ''}</td></tr>
+                                        <tr><td class="label">Address:</td><td>${order[COLUMN_CONFIG.ADDRESS] || ''}</td></tr>
+                                        <tr><td class="label">Sales Representative:</td><td>${salesRepInfo}</td></tr>
+                                    </tbody>
+                                </table>
+
+                                <div class="section-title">Order Details:</div>
+                                <table class="order-details-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 50%;">Item Description</th>
+                                            <th style="width: 25%;">Quantity</th>
+                                            <th style="width: 25%;">Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${productRowsHTML}
+                                    </tbody>
+                                </table>
+                            </main>
+
+                            <footer class="invoice-footer">
+                                <div class="footer-left-content">
+                                    <div class="summary-container">
+                                        <div class="summary-item">
+                                            <div class="summary-label">Total Amount</div>
+                                            <div class="summary-value">${formattedTotalAmount}</div>
+                                        </div>
+                                        <div class="summary-item">
+                                            <div class="summary-label">Shipping</div>
+                                            <div class="summary-value">${order[COLUMN_CONFIG.SHIPPING_UNIT] || 'N/A'}</div>
+                                        </div>
+                                        <div class="summary-item">
+                                            <div class="summary-label">Prepaid</div>
+                                            <div class="summary-value">${formattedPrepaidAmount}</div>
+                                        </div>
+                                        <div class="summary-item cod-item">
+                                            <div class="summary-label">COD</div>
+                                            <div class="summary-value">${formattedCodAmount}</div>
+                                        </div>
+                                    </div>
+                                    <div class="footer-bottom">
+                                        <div class="footer-text">
+                                            <div class="thank-you">Thank you for your purchase!</div>
+                                            <div class="contact-us">If you need any assistant, please kindly contact us!</div>
+                                        </div>
+                                        <img src="https://quickchart.io/qr?text=${encodeURIComponent(qrCodeData)}" alt="QR Code" class="bottom-right-image" onerror="this.style.display='none'">
+                                    </div>
+                                </div>
+                            </footer>
+                        </div>
+                    `;
+                });
+
+                wrapper.innerHTML = allInvoicesHTML;
+                statusMsg.textContent = `Đã tải thành công ${orders.length} hóa đơn.`;
+
+            } catch (error) {
+                console.error("Lỗi khi tạo hóa đơn:", error);
+                statusMsg.textContent = `Không thể tải dữ liệu hóa đơn. Lỗi: ${error.message}`;
+                statusMsg.classList.add('error');
+            }
+        }
+
+        window.addEventListener('load', generateInvoices);
+    </script>
+
+</body>
+
+</html>
