@@ -16,118 +16,252 @@
 
     <div class="container mx-auto p-4 sm:p-6 lg:p-8">
         <header class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">User Progress Dashboard</h1>
-            <p class="text-gray-600 mt-1">Select a user to review their course progress and test results.</p>
+            <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+            <p class="text-gray-600 mt-1">Review user progress or manage course content.</p>
         </header>
 
-        <!-- User Selector -->
-        <div class="mb-8 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 max-w-xl">
-            <div>
-                <label for="departmentFilter" class="block text-sm font-medium text-gray-700 mb-2">Filter by
-                    Department:</label>
-                <select id="departmentFilter"
-                    class="w-full bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                </select>
-            </div>
-
-            <div>
-                <label for="userSelector" class="block text-sm font-medium text-gray-700 mb-2">Select User:</label>
-                <select id="userSelector" class="w-full">
-                </select>
-            </div>
+        <!-- Tab Navigation -->
+        <div class="mb-8 border-b border-gray-200">
+            <nav class="flex -mb-px" aria-label="Tabs">
+                <a href="#" id="tab-user-progress"
+                    class="w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm text-indigo-600 border-indigo-500">
+                    User Progress
+                </a>
+                <a href="#" id="tab-content-management"
+                    class="w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300">
+                    Content Management
+                </a>
+            </nav>
         </div>
 
-        <!-- Main Dashboard Content -->
-        <main id="dashboardContent" class="space-y-8">
-            <!-- Overall Stats Section -->
-            <section>
-                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Overall Completion</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-xl shadow-md flex flex-col justify-between">
-                        <div>
-                            <h3 class="font-semibold text-gray-500">Videos Watched</h3>
-                            <p id="videosWatchedStat" class="text-3xl font-bold mt-2"></p>
-                        </div>
-                        <div class="mt-4">
-                            <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                <div id="videosWatchedProgress" class="bg-blue-600 h-2.5 rounded-full"
-                                    style="width: 0%"></div>
+        <!-- Tab Content: User Progress -->
+        <div id="content-user-progress">
+            <!-- MOVE 1: User Selector goes IN HERE -->
+            <div class="mb-8 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 max-w-xl">
+                <div>
+                    <label for="departmentFilter" class="block text-sm font-medium text-gray-700 mb-2">Filter by
+                        Department:</label>
+                    <select id="departmentFilter"
+                        class="w-full bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    </select>
+                </div>
+                <div>
+                    <label for="userSelector" class="block text-sm font-medium text-gray-700 mb-2">Select User:</label>
+                    <select id="userSelector" class="w-full">
+                    </select>
+                </div>
+            </div>
+
+            <!-- MOVE 2: Main Dashboard Content goes IN HERE -->
+            <main id="dashboardContent" class="space-y-8">
+                <!-- Overall Stats Section -->
+                <section>
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Overall Completion</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-xl shadow-md flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-semibold text-gray-500">Videos Watched</h3>
+                                <p id="videosWatchedStat" class="text-3xl font-bold mt-2"></p>
+                            </div>
+                            <div class="mt-4">
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div id="videosWatchedProgress" class="bg-blue-600 h-2.5 rounded-full"
+                                        style="width: 0%"></div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-md flex flex-col justify-between">
-                        <div>
-                            <h3 class="font-semibold text-gray-500">Time Watched</h3>
-                            <p id="timeWatchedStat" class="text-3xl font-bold mt-2"></p>
+                        <div class="bg-white p-6 rounded-xl shadow-md flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-semibold text-gray-500">Time Watched</h3>
+                                <p id="timeWatchedStat" class="text-3xl font-bold mt-2"></p>
+                            </div>
+                            <div class="mt-4">
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div id="timeWatchedProgress" class="bg-green-600 h-2.5 rounded-full"
+                                        style="width: 0%"></div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="mt-4">
-                            <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                <div id="timeWatchedProgress" class="bg-green-600 h-2.5 rounded-full" style="width: 0%">
+                        <div class="bg-white p-6 rounded-xl shadow-md flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-semibold text-gray-500">Average Test Score</h3>
+                                <p id="avgScoreStat" class="text-3xl font-bold mt-2"></p>
+                            </div>
+                            <div class="mt-4">
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div id="avgScoreProgress" class="bg-yellow-500 h-2.5 rounded-full"
+                                        style="width: 0%"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="bg-white p-6 rounded-xl shadow-md flex flex-col justify-between">
-                        <div>
-                            <h3 class="font-semibold text-gray-500">Average Test Score</h3>
-                            <p id="avgScoreStat" class="text-3xl font-bold mt-2"></p>
+                </section>
+
+                <!-- Detailed Video & Test Scores Section -->
+                <section>
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Detailed Results</h2>
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left text-gray-600">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3">Video Title</th>
+                                        <th scope="col" class="px-6 py-3">Watch Time</th>
+                                        <th scope="col" class="px-6 py-3">Status</th>
+                                        <th scope="col" class="px-6 py-3">Test Score</th>
+                                        <th scope="col" class="px-6 py-3">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="resultsTableBody">
+                                    <!-- Rows populated by JS -->
+                                </tbody>
+                            </table>
                         </div>
-                        <div class="mt-4">
-                            <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                <div id="avgScoreProgress" class="bg-yellow-500 h-2.5 rounded-full" style="width: 0%">
+                    </div>
+                </section>
+
+                <section id="approvalSection" class="hidden">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Account Approval</h2>
+                    <div class="bg-white rounded-xl shadow-md p-6 flex justify-between items-center">
+                        <div>
+                            <h3 class="font-semibold text-lg text-yellow-800">Pending Approval</h3>
+                            <p id="approvalText" class="text-gray-600 mt-1">This user's account is awaiting approval.
+                            </p>
+                        </div>
+                        <button id="approveUserBtn"
+                            class="px-5 py-2 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition ease-in-out duration-150">
+                            Approve Account
+                        </button>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- Tab Content: Content Management -->
+        <div id="content-content-management" class="hidden">
+            <!-- MOVE 3: The entire upload grid goes IN HERE -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Left Column: Upload Forms -->
+                <div class="space-y-8">
+                    <!-- Video Upload Section -->
+                    <section id="video-upload-section">
+                        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Upload New Video</h2>
+                        <div class="bg-white rounded-xl shadow-md p-6">
+                            <form id="video-upload-form" class="space-y-4">
+                                <div>
+                                    <label for="video-title" class="block text-sm font-medium text-gray-700">Video
+                                        Title</label>
+                                    <input type="text" id="video-title"
+                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                 </div>
+
+                                <!-- New Custom File Input Structure -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Video File</label>
+                                    <div class="mt-1 flex items-center space-x-4">
+                                        <!-- The hidden file input -->
+                                        <input type="file" id="video-file-input" class="hidden">
+
+                                        <!-- The custom button (a label linked to the input) -->
+                                        <label for="video-file-input"
+                                            class="cursor-pointer rounded-md bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-100">
+                                            Choose File
+                                        </label>
+
+                                        <!-- The text where the filename will be displayed -->
+                                        <span id="video-file-name" class="text-sm text-gray-600">No file chosen</span>
+                                    </div>
+                                </div>
+                                <button type="submit"
+                                    class="px-5 py-2 bg-indigo-600 text-white font-semibold rounded-md">Upload
+                                    Video</button>
+                            </form>
+                        </div>
+                    </section>
+                    <!-- Document Upload Section -->
+                    <section id="document-upload-section">
+                        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Upload Document</h2>
+                        <div class="bg-white rounded-xl shadow-md p-6">
+                            <form id="document-upload-form" class="space-y-4">
+                                <div>
+                                    <label for="document-title" class="block text-sm font-medium text-gray-700">Document
+                                        Title</label>
+                                    <input type="text" id="document-title"
+                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                </div>
+                    
+                                <!-- Custom File Input for Documents -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Document File</label>
+                                    <div class="mt-1 flex items-center space-x-4">
+                                        <input type="file" id="document-file-input" class="hidden">
+                                        <label for="document-file-input"
+                                            class="cursor-pointer rounded-md bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-100">
+                                            Choose File
+                                        </label>
+                                        <span id="document-file-name" class="text-sm text-gray-600">No file chosen</span>
+                                    </div>
+                                </div>
+                    
+                                <button type="submit"
+                                    class="px-5 py-2 bg-indigo-600 text-white font-semibold rounded-md">Upload
+                                    Document</button>
+                            </form>
+                        </div>
+                    </section>
+                    <!-- Question Upload Section -->
+                    <section id="question-upload-section">
+                        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Add Test Questions</h2>
+                        <div class="bg-white rounded-xl shadow-md p-6">
+                            <form id="question-upload-form" class="space-y-4">
+                                <div>
+                                    <label for="associated-video"
+                                        class="block text-sm font-medium text-gray-700">Associated Video</label>
+                                    <select id="associated-video"
+                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                                        <!-- Options will be populated by JS -->
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="question-text"
+                                        class="block text-sm font-medium text-gray-700">Question</label>
+                                    <input type="text" id="question-text"
+                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                                </div>
+                                <div>
+                                    <label for="correct-answer" class="block text-sm font-medium text-gray-700">Correct
+                                        Answer</label>
+                                    <input type="text" id="correct-answer"
+                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                                </div>
+                                <button type="submit"
+                                    class="px-5 py-2 bg-indigo-600 text-white font-semibold rounded-md">Add
+                                    Question</button>
+                            </form>
+                        </div>
+                    </section>
+                </div>
+                <!-- Right Column: Existing Content Library -->
+                <div class="space-y-8">
+                    <section id="content-library-section">
+                        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Content Library</h2>
+                        <div class="bg-white rounded-xl shadow-md p-6">
+                            <!-- A list or table of uploaded content would go here -->
+                            <div id="uploaded-videos-list">
+                                <!-- Dynamically populated -->
                             </div>
                         </div>
-                    </div>
+                    </section>
                 </div>
-            </section>
-
-            <!-- Detailed Video & Test Scores Section -->
-            <section>
-                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Detailed Results</h2>
-                <div class="bg-white rounded-xl shadow-md overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left text-gray-600">
-                            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3">Video Title</th>
-                                    <th scope="col" class="px-6 py-3">Watch Time</th>
-                                    <th scope="col" class="px-6 py-3">Status</th>
-                                    <th scope="col" class="px-6 py-3">Test Score</th>
-                                    <th scope="col" class="px-6 py-3">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="resultsTableBody">
-                                <!-- Rows populated by JS -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-            </section>
-
-            <section id="approvalSection" class="hidden">
-                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Account Approval</h2>
-                <div class="bg-white rounded-xl shadow-md p-6 flex justify-between items-center">
-                    <div>
-                        <h3 class="font-semibold text-lg text-yellow-800">Pending Approval</h3>
-                        <p id="approvalText" class="text-gray-600 mt-1">This user's account is awaiting approval.</p>
-                    </div>
-                    <button id="approveUserBtn"
-                        class="px-5 py-2 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition ease-in-out duration-150">
-                        Approve Account
-                    </button>
-                </div>
-            </section>
-        </main>
+            </div>
+        </div>
     </div>
 
     <!-- Test Review Modal -->
     <div id="testReviewModal" class="fixed inset-0 z-50 hidden items-center justify-center pointer-events-none">
-        <!-- Modal Panel -->
+        <!-- Modal content... -->
         <div
             class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] flex flex-col modal-panel pointer-events-auto">
-            <!-- Modal Header -->
             <div class="flex justify-between items-center p-4 border-b">
                 <h3 class="text-lg font-semibold" id="modalTitle">Test Review</h3>
                 <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600">
@@ -137,14 +271,10 @@
                     </svg>
                 </button>
             </div>
-            <!-- Modal Body -->
-            <div id="modalBody" class="p-6 space-y-6 overflow-y-auto">
-                <!-- Test questions will be inserted here -->
-            </div>
-            <!-- Modal Footer -->
+            <div id="modalBody" class="p-6 space-y-6 overflow-y-auto"></div>
             <div class="flex justify-end p-4 border-t bg-gray-50 rounded-b-lg">
                 <button id="closeModalFooterBtn"
-                    class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Close</button>
+                    class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Close</button>
             </div>
         </div>
     </div>
