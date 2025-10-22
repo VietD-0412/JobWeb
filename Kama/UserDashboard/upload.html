@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="bg-gray-50 antialiased text-gray-800">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <!-- ======================= -->
+        <!--    HEADER & NAVIGATION  -->
+        <!-- ======================= -->
+        <header class="mb-8">
+            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Content Management</h1>
+                    <p class="text-gray-600 mt-1">Upload new videos, documents, and test questions.</p>
+                </div>
+                <a href="admin.html"
+                    class="inline-block text-center px-5 py-2 bg-gray-600 text-white font-semibold rounded-md shadow-sm hover:bg-gray-700 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                    &larr; Back to Dashboard
+                </a>
+            </div>
+        </header>
+
+        <!-- ======================= -->
+        <!--    UPLOAD FORMS         -->
+        <!-- ======================= -->
+        <main>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+                <!-- Left Column: File Uploads -->
+                <div class="space-y-8 bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-xl font-semibold text-gray-800 border-b pb-3">Upload New Content</h2>
+
+                    <!-- Video Upload Form -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">1. Upload Video File</label>
+                        <div
+                            class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                            <div class="space-y-1 text-center">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none"
+                                    viewBox="0 0 48 48" aria-hidden="true">
+                                    <path
+                                        d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                </svg>
+                                <div class="flex text-sm text-gray-600">
+                                    <label for="videoFileInput"
+                                        class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none">
+                                        <span>Upload a file</span>
+                                        <input id="videoFileInput" name="videoFileInput" type="file" class="sr-only">
+                                    </label>
+                                    <p class="pl-1">or drag and drop</p>
+                                </div>
+                                <p class="text-xs text-gray-500">MP4, MOV, AVI up to 500MB</p>
+                                <span id="videoFileName" class="text-sm font-semibold text-green-700 block mt-2">No file
+                                    chosen</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Document Upload Form -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">2. Upload Supporting Document
+                            (Optional)</label>
+                        <div
+                            class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                            <div class="space-y-1 text-center">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none"
+                                    viewBox="0 0 48 48" aria-hidden="true">
+                                    <path
+                                        d="M9 17v-2.121a4 4 0 011.172-2.828l4-4A4 4 0 0117.879 7h8.242a4 4 0 012.828 1.172l4 4A4 4 0 0134.121 14.88V17M12 21h1.5a3 3 0 000-6H12v6zm18 0h-1.5a3 3 0 000-6H30v6zm-6 6v10m-4-6l4 6 4-6"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                </svg>
+                                <div class="flex text-sm text-gray-600">
+                                    <label for="documentFileInput"
+                                        class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500">
+                                        <span>Upload a file</span>
+                                        <input id="documentFileInput" name="documentFileInput" type="file"
+                                            class="sr-only">
+                                    </label>
+                                    <p class="pl-1">or drag and drop</p>
+                                </div>
+                                <p class="text-xs text-gray-500">PDF, DOCX, TXT up to 10MB</p>
+                                <span id="documentFileName" class="text-sm font-semibold text-green-700 block mt-2">No
+                                    file chosen</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Test Questions -->
+                <div class="space-y-6 bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-xl font-semibold text-gray-800 border-b pb-3">3. Create Test Questions</h2>
+                    <div id="questionsContainer" class="space-y-4">
+                        <p class="text-center text-gray-500 py-4">Click the button below to add the first question.</p>
+                    </div>
+                    <button id="addQuestionBtn" type="button"
+                        class="w-full flex justify-center py-2 px-4 border border-dashed border-gray-400 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        + Add Question
+                    </button>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="mt-8 flex justify-end">
+                <button type="submit"
+                    class="px-8 py-3 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Save New Content
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- This page only needs the upload-related scripts -->
+    <script type="module" src="./js/upload/upload.js"></script>
+
+</body>
+
+</html>

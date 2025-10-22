@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Progress Dashboard</title>
+    <title>Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
@@ -12,43 +12,42 @@
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js" defer></script>
 </head>
 
-<body class="antialiased text-gray-800">
+<body class="bg-gray-50 antialiased text-gray-800">
 
     <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <!-- ======================= -->
+        <!--    HEADER & NAVIGATION  -->
+        <!-- ======================= -->
         <header class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-            <p class="text-gray-600 mt-1">Review user progress or manage course content.</p>
+            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+                    <p class="text-gray-600 mt-1">Review user progress statistics.</p>
+                </div>
+                <a href="upload.html"
+                    class="inline-block text-center px-5 py-2 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Manage Content &rarr;
+                </a>
+            </div>
         </header>
 
-        <!-- Tab Navigation -->
-        <div class="mb-8 border-b border-gray-200">
-            <nav class="flex -mb-px" aria-label="Tabs">
-                <a href="#" id="tab-user-progress"
-                    class="w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm text-indigo-600 border-indigo-500">
-                    User Progress
-                </a>
-            </nav>
-        </div>
-
-        <!-- Tab Content: User Progress -->
+        <!-- ======================= -->
+        <!--    USER PROGRESS CONTENT -->
+        <!-- ======================= -->
         <div id="content-user-progress">
-            <!-- MOVE 1: User Selector goes IN HERE -->
+            <!-- User & Department Selector -->
             <div class="mb-8 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 max-w-xl">
                 <div>
                     <label for="departmentFilter" class="block text-sm font-medium text-gray-700 mb-2">Filter by
                         Department:</label>
-                    <select id="departmentFilter"
-                        class="w-full bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                    </select>
+                    <select id="departmentFilter"></select>
                 </div>
                 <div>
                     <label for="userSelector" class="block text-sm font-medium text-gray-700 mb-2">Select User:</label>
-                    <select id="userSelector" class="w-full">
-                    </select>
+                    <select id="userSelector"></select>
                 </div>
             </div>
 
-            <!-- Main Dashboard Content goes IN HERE -->
             <main id="dashboardContent" class="space-y-8">
                 <!-- Overall Stats Section -->
                 <section>
@@ -57,7 +56,7 @@
                         <div class="bg-white p-6 rounded-xl shadow-md flex flex-col justify-between">
                             <div>
                                 <h3 class="font-semibold text-gray-500">Videos Watched</h3>
-                                <p id="videosWatchedStat" class="text-3xl font-bold mt-2"></p>
+                                <p id="videosWatchedStat" class="text-3xl font-bold mt-2">0 / 0</p>
                             </div>
                             <div class="mt-4">
                                 <div class="w-full bg-gray-200 rounded-full h-2.5">
@@ -69,7 +68,7 @@
                         <div class="bg-white p-6 rounded-xl shadow-md flex flex-col justify-between">
                             <div>
                                 <h3 class="font-semibold text-gray-500">Time Watched</h3>
-                                <p id="timeWatchedStat" class="text-3xl font-bold mt-2"></p>
+                                <p id="timeWatchedStat" class="text-3xl font-bold mt-2">0s</p>
                             </div>
                             <div class="mt-4">
                                 <div class="w-full bg-gray-200 rounded-full h-2.5">
@@ -81,7 +80,7 @@
                         <div class="bg-white p-6 rounded-xl shadow-md flex flex-col justify-between">
                             <div>
                                 <h3 class="font-semibold text-gray-500">Average Test Score</h3>
-                                <p id="avgScoreStat" class="text-3xl font-bold mt-2"></p>
+                                <p id="avgScoreStat" class="text-3xl font-bold mt-2">0%</p>
                             </div>
                             <div class="mt-4">
                                 <div class="w-full bg-gray-200 rounded-full h-2.5">
@@ -116,9 +115,11 @@
                     </div>
                 </section>
 
+                <!-- Account Approval Section -->
                 <section id="approvalSection" class="hidden">
                     <h2 class="text-2xl font-semibold text-gray-800 mb-4">Account Approval</h2>
-                    <div class="bg-white rounded-xl shadow-md p-6 flex justify-between items-center">
+                    <div
+                        class="bg-white rounded-xl shadow-md p-6 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                         <div>
                             <h3 class="font-semibold text-lg text-yellow-800">Pending Approval</h3>
                             <p id="approvalText" class="text-gray-600 mt-1">This user's account is awaiting approval.
@@ -132,31 +133,29 @@
                 </section>
             </main>
         </div>
+    </div>
 
-        <!-- Test Review Modal -->
-        <div id="testReviewModal" class="fixed inset-0 z-50 hidden items-center justify-center pointer-events-none">
-            <!-- Modal content... -->
-            <div
-                class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] flex flex-col modal-panel pointer-events-auto">
-                <div class="flex justify-between items-center p-4 border-b">
-                    <h3 class="text-lg font-semibold" id="modalTitle">Test Review</h3>
-                    <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12">
-                            </path>
-                        </svg>
-                    </button>
-                </div>
-                <div id="modalBody" class="p-6 space-y-6 overflow-y-auto"></div>
-                <div class="flex justify-end p-4 border-t bg-gray-50 rounded-b-lg">
-                    <button id="closeModalFooterBtn"
-                        class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Close</button>
-                </div>
+    <!-- ======================= -->
+    <!--    TEST REVIEW MODAL    -->
+    <!-- ======================= -->
+    <div id="testReviewModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h3 class="text-lg font-semibold" id="modalTitle">Test Review</h3>
+                <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
+            </div>
+            <div id="modalBody" class="p-6 space-y-6 overflow-y-auto">
+                <!-- Modal content populated by JS -->
+            </div>
+            <div class="flex justify-end p-4 border-t bg-gray-50 rounded-b-lg">
+                <button id="closeModalFooterBtn"
+                    class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Close</button>
             </div>
         </div>
+    </div>
 
-        <script type="module" src="main.js"></script>
+    <!-- This page only needs the main dashboard script -->
+    <script type="module" src="./js/dashboard/main.js"></script>
 
 </body>
 
