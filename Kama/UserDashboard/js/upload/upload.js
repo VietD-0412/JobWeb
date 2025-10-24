@@ -2,8 +2,9 @@
 
 import { handleVideoUpload } from './videoHandler.js';
 import { handleDocumentUpload } from './docsHandler.js';
-import { contentLibrary } from './uploadAPI.js'; // Our mock data
-import { showConnectionModal } from './connection.js'; // The modal logic
+import { initTestQuestionForm } from './testHandler.js';
+import { contentLibrary } from './uploadAPI.js';
+import { showConnectionModal } from './connection.js';
 
 // --- DOM ELEMENTS ---
 const videoTitleInput = document.getElementById('videoTitleInput');
@@ -47,7 +48,27 @@ const renderVideoList = () => {
 };
 
 /**
- * Handles the "Save New Content" button click.
+ * Handles deleting a video. This remains here as it directly manipulates the
+ * content library list, which this controller is responsible for rendering.
+ */
+const handleDeleteVideo = (e) => {
+    if (e.target.classList.contains('delete-video-btn')) {
+        const videoIdToDelete = parseInt(e.target.dataset.videoId);
+        
+        if (confirm("Are you sure you want to delete this video? This cannot be undone.")) {
+            const videoIndex = contentLibrary.findIndex(video => video.id === videoIdToDelete);
+            
+            if (videoIndex > -1) {
+                contentLibrary.splice(videoIndex, 1);
+                renderVideoList();
+            }
+        }
+    }
+};
+
+
+/**
+ * Handles the "Save New Content" button click, orchestrating the entire process.
  */
 const handleSaveContent = () => {
     const title = videoTitleInput.value.trim();
@@ -57,6 +78,8 @@ const handleSaveContent = () => {
         alert("Please provide a title and select a video file.");
         return;
     }
+    
+    // Note: Logic to gather questions from the test-handler would go here.
 
     const newVideo = {
         id: Date.now(),
@@ -66,10 +89,10 @@ const handleSaveContent = () => {
         prerequisiteVideoId: null,
     };
 
-    // Show the connection modal. The logic to add the video happens in the callback.
+    // The modal is shown, and the rest of the logic happens in its callback
     showConnectionModal(newVideo, contentLibrary, (selectedPrerequisiteId) => {
         newVideo.prerequisiteVideoId = selectedPrerequisiteId;
-        contentLibrary.push(newVideo); // Add the fully configured video to the library
+        contentLibrary.push(newVideo);
         
         renderVideoList();
         
@@ -83,38 +106,19 @@ const handleSaveContent = () => {
 };
 
 /**
- * Handles deleting a video from the library.
- * This function uses splice() to directly mutate the imported array.
- * @param {Event} e - The click event.
- */
-const handleDeleteVideo = (e) => {
-    if (e.target.classList.contains('delete-video-btn')) {
-        const videoIdToDelete = parseInt(e.target.dataset.videoId);
-        
-        if (confirm("Are you sure you want to delete this video? This cannot be undone.")) {
-            const videoIndex = contentLibrary.findIndex(video => video.id === videoIdToDelete);
-            
-            if (videoIndex > -1) {
-                // Remove 1 element at the found index
-                contentLibrary.splice(videoIndex, 1);
-                // Re-render the list to show the change
-                renderVideoList();
-            }
-        }
-    }
-};
-
-/**
- * Initializes all event listeners and the initial view.
+ * Initializes all event listeners and handlers.
  */
 const init = () => {
+    // Initialize individual component handlers
     handleVideoUpload(videoFileInput, videoFileNameSpan);
     handleDocumentUpload(documentFileInput, documentFileNameSpan);
+    initTestQuestionForm(); // Note: This requires the question-related HTML to be on the page
 
+    // Initialize page-level event listeners
     saveContentBtn.addEventListener('click', handleSaveContent);
     videoListContainer.addEventListener('click', handleDeleteVideo);
 
-    // Initial render of the video list when the page loads
+    // Initial render of the video list
     renderVideoList();
 };
 

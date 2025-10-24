@@ -15,7 +15,7 @@
     <div class="container mx-auto p-4 sm:p-6 lg:p-8">
         <!-- HEADER & NAVIGATION -->
         <header class="mb-8">
-             <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900">Content Management</h1>
                     <p class="text-gray-600 mt-1">Upload new videos, documents, and test questions.</p>
@@ -27,55 +27,85 @@
             </div>
         </header>
 
-        <!-- UPLOAD FORMS -->
+        <!-- UPLOAD FORMS & QUESTIONS -->
         <main class="space-y-8">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Left Column: File Uploads & Test Questions -->
+                <!-- Left Column: File Uploads -->
                 <div class="space-y-6 bg-white p-6 rounded-xl shadow-md">
-                     <h2 class="text-xl font-semibold text-gray-800 border-b pb-3">Create New Content</h2>
-                     <!-- Video Title Input -->
-                     <div>
-                        <label for="videoTitleInput" class="block text-sm font-medium text-gray-700">1. Video Title</label>
-                        <input type="text" id="videoTitleInput" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="e.g., Advanced State Management">
-                     </div>
-                     <!-- Video Upload -->
-                     <div>
+                    <h2 class="text-xl font-semibold text-gray-800 border-b pb-3">Upload</h2>
+                    <!-- Video Title Input -->
+                    <div>
+                        <label for="videoTitleInput" class="block text-sm font-medium text-gray-700">1. Video
+                            Title</label>
+                        <input type="text" id="videoTitleInput"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            placeholder="e.g., Advanced State Management">
+                    </div>
+                    <!-- Video Upload -->
+                    <div>
                         <label class="block text-sm font-medium text-gray-700">2. Upload Video File</label>
-                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                        <div
+                            class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
                             <div class="space-y-1 text-center">
-                                <!-- Icon and upload button -->
-                                <div class="flex text-sm text-gray-600"><label for="videoFileInput" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500"><span>Upload a file</span><input id="videoFileInput" type="file" class="sr-only"></label></div>
-                                <span id="videoFileName" class="text-xs font-semibold text-green-700">No file chosen</span>
+                                <div class="flex text-sm text-gray-600"><label for="videoFileInput"
+                                        class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500"><span>Upload
+                                            a file</span><input id="videoFileInput" type="file" class="sr-only"></label>
+                                </div>
+                                <span id="videoFileName" class="text-xs font-semibold text-green-700">No file
+                                    chosen</span>
                             </div>
                         </div>
                     </div>
-                     <!-- Document Upload -->
-                     <div>
-                         <label class="block text-sm font-medium text-gray-700">3. Upload Document (Optional)</label>
-                         <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                             <div class="space-y-1 text-center">
-                                 <!-- Icon and upload button -->
-                                 <div class="flex text-sm text-gray-600"><label for="documentFileInput" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500"><span>Upload a file</span><input id="documentFileInput" type="file" class="sr-only"></label></div>
-                                 <span id="documentFileName" class="text-xs font-semibold text-green-700">No file chosen</span>
-                             </div>
-                         </div>
-                     </div>
-                     <!-- Save Button -->
-                     <div class="pt-4 flex justify-end">
-                         <button id="saveContentBtn" class="px-8 py-3 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700">
-                             Save New Content
-                         </button>
-                     </div>
-                </div>
-
-                <!-- Right Column: Existing Content -->
-                <div class="bg-white p-6 rounded-xl shadow-md">
-                    <h2 class="text-xl font-semibold text-gray-800 border-b pb-3">Existing Content Library</h2>
-                    <div id="videoListContainer" class="mt-4 space-y-3">
-                        <!-- Video list will be dynamically rendered here -->
-                        <p class="text-center text-gray-500 py-4">No content found.</p>
+                    <!-- Document Upload -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">3. Upload Document</label>
+                        <div
+                            class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                            <div class="space-y-1 text-center">
+                                <div class="flex text-sm text-gray-600"><label for="documentFileInput"
+                                        class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500"><span>Upload
+                                            a file</span><input id="documentFileInput" type="file"
+                                            class="sr-only"></label></div>
+                                <span id="documentFileName" class="text-xs font-semibold text-green-700">No file
+                                    chosen</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Right Column: Add Test Questions -->
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-xl font-semibold text-gray-800 border-b pb-3">Add Test Questions</h2>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700"></label>
+                        <div id="questionsContainer" class="mt-2 space-y-4">
+                            <!-- Dynamically added questions will appear here -->
+                            <p class="text-center text-gray-500 py-4">No questions added yet.</p>
+                        </div>
+                        <div class="mt-4">
+                            <button id="addQuestionBtn" type="button"
+                                class="w-full px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-md hover:bg-gray-300">
+                                + Add Another Question
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Existing Content Library (Moved Below) -->
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <h2 class="text-xl font-semibold text-gray-800 border-b pb-3">Existing Video Library</h2>
+                <div id="videoListContainer" class="mt-4 space-y-3">
+                    <!-- Video list will be dynamically rendered here -->
+                    <p class="text-center text-gray-500 py-4">No content found.</p>
+                </div>
+            </div>
+            <!-- Save Button -->
+            <div class="pt-4 flex justify-end">
+                <button id="saveContentBtn"
+                    class="w-full lg:w-auto px-12 py-4 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700">
+                    Save
+                </button>
             </div>
         </main>
     </div>
@@ -87,26 +117,31 @@
         <div class="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4">
             <div class="flex justify-between items-center p-4 border-b">
                 <h3 class="text-lg font-semibold">Set Video Prerequisite</h3>
-                <button id="closeConnectionModalBtn" class="text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
+                <button id="closeConnectionModalBtn"
+                    class="text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
             </div>
             <div class="p-6 space-y-4">
-                <p>Set the viewing order for "<strong id="modalVideoTitle"></strong>". Should this video be available immediately, or only after a user completes another one?</p>
+                <p>Set the viewing order for "<strong id="modalVideoTitle"></strong>". Should this video be available
+                    immediately, or only after a user completes another one?</p>
                 <div>
-                    <label for="prerequisiteSelector" class="block text-sm font-medium text-gray-700">Viewing Requirement:</label>
-                    <select id="prerequisiteSelector" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    <label for="prerequisiteSelector" class="block text-sm font-medium text-gray-700">Viewing
+                        Requirement:</label>
+                    <select id="prerequisiteSelector"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                         <!-- Options will be populated by JS -->
                     </select>
                 </div>
             </div>
             <div class="flex justify-end p-4 border-t bg-gray-50 rounded-b-lg">
-                <button id="saveConnectionBtn" class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Save Setting</button>
+                <button id="saveConnectionBtn"
+                    class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Save Setting</button>
             </div>
         </div>
     </div>
-
 
     <!-- Load all upload-related scripts -->
     <script type="module" src="./js/upload/upload.js"></script>
 
 </body>
+
 </html>
